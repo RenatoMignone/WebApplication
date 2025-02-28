@@ -1,25 +1,25 @@
-"use strict";
+'use strict';
 
-const namesString = 'Luigi De Russis, Luca Mannella, Fulvio Corno, Juan Pablo Saenz Moreno, Enrico Masala, Antonio Servetti';
+const userNames = `luigi de russis, luca Mannella, 
+    Fulvio Corno, Juan Pablo Saenz Moreno,  
+    Enrico Masala, Antonio Servetti `;
 
-const names = namesString => namesString.split(',');
+const names = userNames.split(",");
 
-console.log(names)
+for (let i = 0; i < names.length; i++)
+    names[i] = names[i].trim();
 
-for (let i = 0; i < names.length; i++) {
-  names[i] = names[i].trim();
-}
-
-console.log(userString);
+console.log(userNames);
 console.log(names);
 
-for (const name of names){
-    let s = name.toUpperCase();
-    for (let i=0; i < name.length; i++){
-        if (name[i] === " "){
-            s += name[i+1].toUpperCase();
+const acronyms = [];
+for (const name of names) {
+    let str = name[0].toUpperCase();
+    for (let i = 1; i < name.length; i++)
+        if (name[i-1] === ' ' ) {
+            str = str + name[i].toUpperCase();
         }
-    }
-    console.log(s);
+    //console.log(str);
+    acronyms.push(str);
 }
-
+console.log(acronyms.sort());
