@@ -42,6 +42,5 @@ The repository is organized into two main folders:
   - **NodeJS**
   - **ReactJS**
 
-A sample directory tree looks like this:
 
 
