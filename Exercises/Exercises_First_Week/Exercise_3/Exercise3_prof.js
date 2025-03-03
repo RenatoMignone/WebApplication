@@ -1,5 +1,6 @@
 "use strict";
 
+const dayjs = require('dayjs');
 
 /*----------------------------------------------------------------------*/
 /*
@@ -10,77 +11,75 @@ Each answer should contain:
 - Date
 */
 
-//Constructor for the answer
+// Constructor for the answer
 function Answer(text, respondent, score, date) {
-    //in this case, a new object is created, and it is named "this"
-    //we can refer to the new object, with this new keyword
     this.text = text;
     this.respondent = respondent;
-    this.score = score;
-    this.date = date
-} 
-
+    // Convert score to integer
+    this.score = parseInt(score, 10);
+    // Use dayjs for date
+    this.date = dayjs(date);
+}
 
 /*----------------------------------------------------------------------*/
 /*
-A question, instead, is made of:
+A question is made of:
 - Question (text)
 - Questioner name
 - Date
 - List of answers
 */
 
-//Constructor for the question
+// Constructor for the question
 function Question(question, questioner, date) {
     this.question = question;
+    // Fixed the questioner’s name
     this.questioner = questioner;
-    this.date = date;
+    this.date = dayjs(date);
     this.answers = [];
 
-    //List of the methods implemented for the question class
-    //The result of this instruction is what the function returns
-    //If we instead put the curly braces, the return value would be undefined
+    // Methods of the class
     this.add = (ans) => this.answers.push(ans);
 
+    this.findAll = (name) => this.answers.filter(ans => ans.respondent === name);
 
-    // this.findAll = () => this.answers;       // returns the same list of answers
-    // this.findAll = () => [...this.answers];  // returns a new array [a1, a2, a2]
-    // this.findAll = () => [this.answers];     // returns the same array inside another one. [[a1, a2, a3]]
+    this.afterDate = (date) => this.answers.filter(ans => ans.date.isAfter(date));
 
-    this.findAll = (name) => {
-        let answers = [];
-        for (let answer of this.answers){
-            if (answer.respondent === name) answers.push(answer);
-        }
-    return answers;
-    }
+    this.listByDate = () => [...this.answers].sort((a,b) => a.date.diff(b.date));
 }
 
 /*----------------------------------------------------------------------*/
-
-
 const answers_text = [
-    ["Hello World  ", "Antonio", "0", "2025-03-03"],    //answer 1
-    ["Hello World 2", "Enrico", "0", "2025-03-04"],     //answer 2
-    ["Fine", "Antonio", "2", "2025-03-05"]              //answer 3
-]
+    ["Hello World", "Antonio", "0", "2025-03-03"],
+    ["Hello World 2", "Enrico", "0", "2025-03-04"],
+    ["Fine", "Antonio", "2", "2025-03-05"]
+];
 
 /*----------------------------------------------------------------------*/
-
-const question1 = new Question("How are you today?","Encrico","2025-03-02");
-
+// Updated the questioner’s name to "Enrico"
+const question1 = new Question("How are you today?", "Enrico", "2025-03-02");
 
 /*----------------------------------------------------------------------*/
-
-for(let i=0;i<answers_text.length;i++){
-    const answer = new Answer(answers_text[i][0], answers_text[i][1], answers_text[i][2], answers_text[i][3]);
+for(let i = 0; i < answers_text.length; i++) {
+    const answer = new Answer(
+        answers_text[i][0],
+        answers_text[i][1],
+        answers_text[i][2],
+        answers_text[i][3]
+    );
     question1.add(answer);
 }
 
-// console.log(question1);
-
 /*----------------------------------------------------------------------*/
+// Examples of calling the methods
+console.log("--- findAll('Antonio') ---");
+console.log(question1.findAll("Antonio"));
 
-// console.log(question1);
-console.log("question 1 find all",question1.findAll("Antonio"));
+console.log("\n--- afterDate(2025-03-04) ---");
+console.log(question1.afterDate(dayjs("2025-03-04")));
 
+console.log("\n--- listByDate() ---");
+console.log(question1.listByDate());
+
+console.log("\n--- All answers ---");
+console.log(question1.answers);
