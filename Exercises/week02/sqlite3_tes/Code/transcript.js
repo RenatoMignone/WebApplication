@@ -1,3 +1,8 @@
+//////////////////////////////////////////////////////////////////////
+//Desc: This script reads data from the course and score tables 
+//in the exams.sqlite database and logs the result to the console.
+//////////////////////////////////////////////////////////////////////
+
 // Enforce strict mode
 'use strict';
 
@@ -28,6 +33,9 @@ db.all(sql, (err, rows) => {
 // Log separator
 console.log('********************');
 
+
+//This code here is wrong because the code is executed before the db.all() function is completed.
+//The db.all() function is asynchronous and the code after it will be executed before the query is completed.
 // Iterate over each row in the result array
 for (let row of result) {
     console.log(row.code, row.name); // Log specific columns
