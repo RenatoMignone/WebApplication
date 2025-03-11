@@ -80,6 +80,7 @@ function FilmLibrary() {
          - When an asynchronous operation (e.g., a database query) finishes, we either resolve or reject the Promise.
        ================================================================= */
 
+    //=================================================================
     // Asynchronous method to retrieve all films from the database.
     // The async keyword indicates that this function returns a Promise.
     // Inside, we wrap the SQLite query in a new Promise.
@@ -103,6 +104,7 @@ function FilmLibrary() {
         // When using this method, the caller can use 'await' to wait until this Promise resolves.
     };
 
+    //=================================================================
     // Asynchronous method to retrieve all favorite films from the database.
     this.getFavoriteFilms = async function() {
         const sql = 'SELECT * FROM films WHERE favorite = 1';  // SQL to select films marked as favorite.
@@ -121,6 +123,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to retrieve films watched today.
     this.getFilmsWatchedToday = async function() {
         // Get today's date in 'YYYY-MM-DD' format using dayjs.
@@ -140,6 +143,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to retrieve films watched before a given date.
     this.getFilmsWatchedBefore = async function(date) {
         const sql = 'SELECT * FROM films WHERE watchdate < ?';  // SQL query to select films watched before 'date'.
@@ -156,6 +160,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to retrieve films with a rating greater than or equal to a given value.
     this.getFilmsWithRating = async function(rating) {
         const sql = 'SELECT * FROM films WHERE rating >= ?';  // SQL query with a parameter for rating.
@@ -172,6 +177,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to retrieve films whose title contains a specific substring.
     this.getFilmsWithTitle = async function(title) {
         const sql = 'SELECT * FROM films WHERE title LIKE ?';  // SQL query using LIKE for pattern matching.
@@ -188,6 +194,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to store a new film into the database.
     this.storeFilm = async function(film) {
         // SQL INSERT command to add a film.
@@ -206,6 +213,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to delete a film from the database by its id.
     this.deleteFilmFromDB = async function(id) {
         const sql = 'DELETE FROM films WHERE id = ?';
@@ -220,6 +228,7 @@ function FilmLibrary() {
         });
     };
 
+    //=================================================================
     // Asynchronous method to reset (remove) the watch dates of all films in the database.
     this.resetWatchDatesInDB = async function() {
         const sql = 'UPDATE films SET watchdate = NULL';
@@ -237,14 +246,15 @@ function FilmLibrary() {
 
 /* ======================================================
    Example Usage:
-   We wrap our operations in an immediately invoked async function expression (IIFE).
+   We wrap our operations in an immediately invoked async function expression
    This allows us to use await to pause execution until each asynchronous database operation is complete.
    
    The use of await:
    - It ensures that the function waits for the promise (returned by an async method) to resolve,
      meaning that the data is available before moving on to the next instruction.
    - This simplifies handling asynchronous operations without using explicit .then() callbacks.
-======================================================== */
+
+   ======================================================== */
 (async () => {
     const myLibrary = new FilmLibrary();
     try {
