@@ -301,7 +301,8 @@ function FilmLibrary() {
         // Reset the watch dates in the database for all films.
         const resetMessage = await myLibrary.resetWatchDatesInDB();
         console.log(resetMessage);
-    } catch (err) {
+    } 
+    catch (err) {
         // If any of the above asynchronous operations fail, the error is caught here.
         console.error(err);
     }
