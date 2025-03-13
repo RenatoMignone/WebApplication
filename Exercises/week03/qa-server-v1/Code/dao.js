@@ -5,7 +5,7 @@ const sqlite = require('sqlite3');
 const dayjs = require('dayjs');
 
 // open the database
-const db = new sqlite.Database('qa.db', (err) => {
+const db = new sqlite.Database('../Database/qa.db', (err) => {
   if(err) throw err;
 });
 
