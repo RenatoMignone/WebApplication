@@ -15,6 +15,12 @@ app.get('/', (req, res) => {
   res.send('Hello!');          // Send a simple response to the root URL
 });
 
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//APIs
+
 // ----- GET /api/questions -----
 app.get('/api/questions', (req, res) => {
   dao.listQuestions()          // Retrieve the list of questions from DB
