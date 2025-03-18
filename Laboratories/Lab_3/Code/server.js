@@ -29,33 +29,6 @@ app.get('/api/films', (req, res) => {
     let sql = 'SELECT * FROM films';
     let params = [];
 
-    // Check filter parameter and adjust SQL accordingly
-    if (filter) {
-        switch (filter) {
-            case 'favorite':
-                sql += ' WHERE favorite = 1'; // Only favorite films
-                break;
-            case 'best':
-                sql += ' WHERE rating = 5'; // Only highest-rated films
-                break;
-            case 'lastmonth':
-                // Retrieve films watched in the last 30 days
-                sql += ' WHERE watchdate BETWEEN ? AND ?';
-                params = [
-                  dayjs().subtract(30, 'day').format('YYYY-MM-DD'), 
-                  dayjs().format('YYYY-MM-DD')
-                ];
-                break;
-            case 'unseen':
-                // Films with no watch date
-                sql += ' WHERE watchdate IS NULL';
-                break;
-            default:
-                // No recognized filter, keep the default query
-                break;
-        }
-    }
-
     db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
