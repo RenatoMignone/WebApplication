@@ -29,6 +29,40 @@ app.get('/api/films', (req, res) => {
     let sql = 'SELECT * FROM films';
     let params = [];
 
+    // Check filter parameter and adjust SQL accordingly
+    // thanks to this filter we can create a new parameter in the URL to filter the films
+    // an example is: http://localhost:3001/api/films?filter=best
+    // this so has a query parameter that filters the films by the best rating
+
+    //in this case so we are updating the query of the SQL to filter the films by the best rating
+    //the query is SELECT * FROM films WHERE rating = 5
+
+    if (filter) {
+        switch (filter) {
+            case 'favorite':
+                sql += ' WHERE favorite = 1'; // Only favorite films
+                break;
+            case 'best':
+                sql += ' WHERE rating = 5'; // Only highest-rated films
+                break;
+            case 'lastmonth':
+                // Retrieve films watched in the last 30 days
+                sql += ' WHERE watchdate BETWEEN ? AND ?';
+                params = [
+                dayjs().subtract(30, 'day').format('YYYY-MM-DD'), 
+                dayjs().format('YYYY-MM-DD')
+                ];
+                break;
+            case 'unseen':
+                // Films with no watch date
+                sql += ' WHERE watchdate IS NULL';
+                break;
+            default:
+                // No recognized filter, keep the default query
+                break;
+        }
+    }
+
     db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -45,6 +79,7 @@ app.get('/api/films', (req, res) => {
 app.get('/api/films/:id', (req, res) => {
     const sql = 'SELECT * FROM films WHERE id = ?';
     const params = [req.params.id];
+
     db.get(sql, params, (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -78,6 +113,9 @@ app.post('/api/films', (req, res) => {
             return;
         }
         // Return the newly inserted ID along with the posted data
+        // this format of the response is useful to know the ID of the new film
+        // so the format will be: 
+        // { id: 1, title: 'The Shawshank Redemption', favorite: 1, watchdate: '2021-10-01', rating: 5 }
         res.status(201).json({ id: this.lastID, ...req.body });
     });
 });
@@ -102,6 +140,7 @@ app.put('/api/films/:id/favorite', (req, res) => {
         }
         res.json({ id: req.params.id, favorite });
     });
+    
 });
 
 /*====================================================================*/

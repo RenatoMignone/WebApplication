@@ -1,11 +1,14 @@
+#========================================================================
 ## Retrieve all the films
 GET http://localhost:3001/api/films HTTP/1.1
 ###
 
+#========================================================================
 ## Retrieve a film by ID
 GET http://localhost:3001/api/films/1 HTTP/1.1
 ###
 
+#========================================================================
 ## Create new film (without id)
 POST http://localhost:3001/api/films HTTP/1.1
 content-type: application/json
@@ -18,6 +21,7 @@ content-type: application/json
 }
 ###
 
+#========================================================================
 ## Mark a film as favorite
 PUT http://localhost:3001/api/films/1/favorite HTTP/1.1
 content-type: application/json
@@ -27,6 +31,7 @@ content-type: application/json
 }
 ###
 
+#========================================================================
 ## Change the rating of a film
 PUT http://localhost:3001/api/films/1/rating HTTP/1.1
 content-type: application/json
@@ -36,14 +41,22 @@ content-type: application/json
 }
 ###
 
+#========================================================================
 ## Delete a film
-DELETE http://localhost:3001/api/films/1 HTTP/1.1
+DELETE http://localhost:3001/api/films/6 HTTP/1.1
 ###
 
+#========================================================================
 ## Retrieve films by filter (favorite)
 GET http://localhost:3001/api/films?filter=favorite HTTP/1.1
 ###
 
+#========================================================================
+## Retrieve films by filter (lastmonth)
+GET http://localhost:3001/api/films?filter=lastmonth HTTP/1.1
+###
+
+#========================================================================
 ## Update a film
 PUT http://localhost:3001/api/films/1 HTTP/1.1
 content-type: application/json
@@ -55,3 +68,4 @@ content-type: application/json
     "rating": 5
 }
 ###
+#========================================================================
