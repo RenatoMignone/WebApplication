@@ -1,0 +1,57 @@
+## Retrieve all the films
+GET http://localhost:3001/api/films HTTP/1.1
+###
+
+## Retrieve a film by ID
+GET http://localhost:3001/api/films/1 HTTP/1.1
+###
+
+## Create new film (without id)
+POST http://localhost:3001/api/films HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Guardians of the Galaxy Vol.3",
+    "favorite": 1,
+    "watchDate": "2024-02-09",
+    "rating": 4
+}
+###
+
+## Mark a film as favorite
+PUT http://localhost:3001/api/films/1/favorite HTTP/1.1
+content-type: application/json
+
+{
+    "favorite": 1
+}
+###
+
+## Change the rating of a film
+PUT http://localhost:3001/api/films/1/rating HTTP/1.1
+content-type: application/json
+
+{
+    "delta": 1
+}
+###
+
+## Delete a film
+DELETE http://localhost:3001/api/films/1 HTTP/1.1
+###
+
+## Retrieve films by filter (favorite)
+GET http://localhost:3001/api/films?filter=favorite HTTP/1.1
+###
+
+## Update a film
+PUT http://localhost:3001/api/films/1 HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Pulp Fiction",
+    "favorite": 1,
+    "watchDate": "2023-03-11",
+    "rating": 5
+}
+###
