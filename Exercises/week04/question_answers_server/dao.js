@@ -5,7 +5,7 @@ const sqlite = require('sqlite3');
 const dayjs = require('dayjs');
 
 // open the database
-const db = new sqlite.Database('../Database/qa.db', (err) => {
+const db = new sqlite.Database('qa.db', (err) => {
   if(err) throw err;
 });
 
@@ -24,15 +24,19 @@ exports.listQuestions = () => {
   });
 };
 
+
 // get all answers to a given question
 exports.listAnswersByQuestion = (questionId) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM answers WHERE questionId = ?';
+
     db.all(sql, [questionId], (err, rows) => {
       if (err) {
         reject(err);
         return;
       }
+
+      //console.log('rows: '+JSON.stringify(rows));
       const answers = rows.map((e) => (
         {
           id: e.id,
@@ -42,6 +46,8 @@ exports.listAnswersByQuestion = (questionId) => {
           date: dayjs(e.date),
           questionId: e.questionId,
         }));
+
+      //console.log('answers: '+JSON.stringify(answers));
       resolve(answers);
     });
   });
@@ -57,6 +63,36 @@ exports.createAnswer = (answer) => {
         return;
       }
       resolve(this.lastID);
+    });
+  });
+};
+
+
+// delete an existing answer
+exports.deleteAnswer = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM answers WHERE id = ?';
+    db.run(sql, [id], function (err) {
+      if (err) {
+        reject(err);
+        return;
+      } else
+        resolve(this.changes);  // return the number of affected rows
+    });
+  });
+}
+
+// vote an existing answer
+exports.voteAnswer = (answerId, vote) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE answers SET score= score + ?  WHERE id = ?';
+    const delta = vote==='upvote' ? 1 : -1;
+    db.run(sql, [delta, answerId], function (err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(this.changes);
     });
   });
 };
