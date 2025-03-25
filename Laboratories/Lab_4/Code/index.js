@@ -124,12 +124,16 @@ app.put('/api/films/:id',
         return res.status(404).json(film);
       // the new film object is created with the new values
       // the || operator is used to keep the old value if the new value is not provided
+      console.log(req.body);
+
       const newFilm = {
         title: req.body.title || film.title,
         favorite: req.body.favorite || film.favorite,
         watchDate: req.body.watchDate || film.watchDate,
         rating: req.body.rating || film.rating,
       };
+
+      console.log(newFilm);
       // the updateFilm function is called with the id and the new film object
       const result = await filmDao.updateFilm(film.id, newFilm);
       if (result.error)
