@@ -32,6 +32,36 @@ let answerList = ANSWERS.map(e => new Answer(...e));
 
 answerList.forEach(e => console.log(e.str()));
 
-// Populate the list in the HTML ...
-// ...
+// ...existing code...
+// const tBody = document.getElementById('answers');
 
+// answerList.forEach(answer => {
+//   const row = document.createElement('tr');
+
+//   const dateCell = document.createElement('td');
+//   dateCell.textContent = answer.date.format('YYYY-MM-DD');
+//   row.appendChild(dateCell);
+
+//   const textCell = document.createElement('td');
+//   textCell.textContent = answer.text;
+//   row.appendChild(textCell);
+
+//   const authorCell = document.createElement('td');
+//   authorCell.textContent = answer.respondent;
+//   row.appendChild(authorCell);
+
+//   const scoreCell = document.createElement('td');
+//   scoreCell.textContent = answer.score;
+//   row.appendChild(scoreCell);
+
+//   const actionCell = document.createElement('td');
+//   const voteBtn = document.createElement('button');
+//   voteBtn.classList.add('btn', 'btn-primary', 'btn-sm');
+//   voteBtn.textContent = 'Vote';
+//   actionCell.appendChild(voteBtn);
+//   row.appendChild(actionCell);
+
+//   tBody.appendChild(row);
+// });
+
+// End of file

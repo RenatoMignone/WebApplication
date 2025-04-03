@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-   
+   <!-- Head section: Add metadata, styles, or external resources -->
 </head>
 <body>
-<div id="time" >Hello</div>
-<div class="bold"></div>
-<div class="bold color"></div>
-<script  src="https://unpkg.com/dayjs@1.11.10/dayjs.min.js"
-    integrity="sha384-DpVxUeeBWjUvUV1czyIHJAjh+jYUZFu2lLakbdua5vbwOrBGi1UgaKCHjTC+x3Ky"
-    crossorigin="anonymous">
+    <!-- Display the current time -->
+    <div id="time">Hello</div>
+
+    <!-- Example divs with different classes -->
+    <div class="bold"></div>
+    <div class="bold color"></div>
+
+    <!-- Include the Day.js library for date and time manipulation -->
+    <script src="https://unpkg.com/dayjs@1.11.10/dayjs.min.js"
+        integrity="sha384-DpVxUeeBWjUvUV1czyIHJAjh+jYUZFu2lLakbdua5vbwOrBGi1UgaKCHjTC+x3Ky"
+        crossorigin="anonymous">
     </script>
-<script>
-const timeElement = document.getElementById("time");
-timeElement.innerText = dayjs().format("HH:mm:ss");
-// Updating DOM content via a periodically-called callback function
-setInterval(() => timeElement.innerText = dayjs().format("HH:mm:ss"), 1000);
 
+    <script>
+        // Get the element with id "time" and set its initial text to the current time
+        const timeElement = document.getElementById("time");
+        timeElement.innerText = dayjs().format("HH:mm:ss");
 
-document.getElementById('foo').innerText='Dear Enrico';
-document.querySelector('#foo');
-document.querySelectorAll('.bold');
-document.querySelectorAll('.color');
-document.querySelectorAll('.bold, .color');
-</script>
+        // Update the time every second using setInterval
+        setInterval(() => timeElement.innerText = dayjs().format("HH:mm:ss"), 1000);
+
+        // Example DOM manipulations
+        // Attempt to set text for an element with id "foo" (this element does not exist in the current HTML)
+        document.getElementById('foo').innerText = 'Dear Enrico';
+
+        // Query selectors for elements with specific classes or combinations of classes
+        document.querySelector('#foo'); // Selects the first element with id "foo"
+        document.querySelectorAll('.bold'); // Selects all elements with class "bold"
+        document.querySelectorAll('.color'); // Selects all elements with class "color"
+        document.querySelectorAll('.bold, .color'); // Selects all elements with class "bold" or "color"
+    </script>
 </body>
 </html>
