@@ -8,6 +8,7 @@ import { AnswerTable } from './components/AnswerComponents.jsx';
 import { QuestionDescription } from './components/QuestionComponents.jsx';
 
 import { Question } from './QAModels.js';
+import { AnswerForm } from './components/FormComponents.jsx';
 
 const question = new Question(1, 'Best way of enumerating an array in JS?', 'Enrico', '2024-03-01');
 question.init();
@@ -52,6 +53,12 @@ function Main(props) {
     );
   }
 
+  function addAnswer(answer) {
+    setAnswers( answerList => 
+        [...answerList, answer]
+    )
+  }
+
   return (<>
     <Row>
       <QuestionDescription question={question} />
@@ -65,6 +72,11 @@ function Main(props) {
       <Col>
         <AnswerTable listOfAnswers={answers} vote={voteAnswer} 
         delete={deleteAnswer} />
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+         <AnswerForm addAnswer={addAnswer} />
       </Col>
     </Row>
   </>
