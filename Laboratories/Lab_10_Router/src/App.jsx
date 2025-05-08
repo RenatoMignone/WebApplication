@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Container, Row, Col, Button, Navbar } from 'react-bootstrap';
-import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation, Navigate, Outlet, Link, useOutletContext } from 'react-router-dom';
 import { FilmTable } from './components/FilmLibrary.jsx';
 import FilmForm from './components/FilmForm.jsx';
-import { Filters } from './components/Filters.jsx'; // <-- import the new Filters component
+import { Filters } from './components/Filters.jsx';
+import MyNavbar from './components/MyNavbar.jsx'; // <-- import the new navbar component
 import dayjs from 'dayjs';
 import './App.css'
 
@@ -18,21 +19,6 @@ const initialFilms = [
 
 // ----------
 
-// Header component for the application, displays the navbar.
-function MyHeader() {
-  return (
-    <Navbar bg="primary" variant="dark" className="mb-4">
-      <Container fluid>
-        <Navbar.Brand>
-          <i className="bi bi-collection-play" /> Film Library
-        </Navbar.Brand>
-      </Container>
-    </Navbar>
-  );
-}
-
-// ----------
-
 // Footer component for the application, displays the footer.
 function MyFooter() {
   return (
@@ -44,7 +30,7 @@ function MyFooter() {
 
 // ----------
 
-// Main application content, handles routing, state, and logic for films and filters.
+// Main application content, handles state and logic for films and filters.
 function AppContent() {
   const [films, setFilms] = useState(initialFilms);
   const navigate = useNavigate();
@@ -60,24 +46,26 @@ function AppContent() {
   };
   const filterKeys = Object.keys(filters);
 
-  // Determine active filter from URL
+  // Determine active filter from URL (default to 'all')
   let activeFilter = 'all';
   if (location.pathname.startsWith('/filter/')) {
     const urlFilter = location.pathname.split('/')[2];
     if (filterKeys.includes(urlFilter)) activeFilter = urlFilter;
+  } else if (location.pathname === '/filter') {
+    activeFilter = 'all';
   }
 
-  // Add a new film to the list and navigate back to the current filter.
+  // Add a new film to the list and navigate back to the filter.
   function addFilm(film) {
     const newId = films.length > 0 ? Math.max(...films.map(f => f.id)) + 1 : 1;
     setFilms(films => [...films, { ...film, id: newId }]);
-    navigate(`/filter/${activeFilter}`);
+    navigate('/filter');
   }
 
-  // Edit an existing film and navigate back to the current filter.
+  // Edit an existing film and navigate back to the filter.
   function editFilm(updatedFilm) {
     setFilms(films => films.map(f => f.id === updatedFilm.id ? updatedFilm : f));
-    navigate(`/filter/${activeFilter}`);
+    navigate('/filter');
   }
 
   // Delete a film by id.
@@ -97,7 +85,7 @@ function AppContent() {
 
   // Navigate to a selected filter.
   function handleFilterSelect(filterKey) {
-    navigate(`/filter/${filterKey}`);
+    navigate(filterKey === 'all' ? '/filter' : `/filter/${filterKey}`);
   }
 
   // Helper to check if a film was seen last month.
@@ -108,9 +96,6 @@ function AppContent() {
     }
     return false;
   }
-
-  // Show "+" only on filter routes
-  const showAddButton = location.pathname.startsWith('/filter/') || location.pathname === '/';
 
   // Get a film object by its id.
   function getFilmById(id) {
@@ -124,7 +109,7 @@ function AppContent() {
     <Container fluid>
       <Row>
         <Col>
-          <MyHeader />
+          <MyNavbar /> {/* Use the new navbar component */}
         </Col>
       </Row>
       <Row>
@@ -132,73 +117,10 @@ function AppContent() {
           <Filters items={filterArray} selected={activeFilter} onSelect={handleFilterSelect} />
         </Col>
         <Col xs={9}>
-          <Routes>
-            {/* 
-              "/" route:
-              - Redirects to "/filter/all" using <Navigate>.
-              - Ensures the default view is the full film list.
-            */}
-            <Route path="/" element={<Navigate to="/filter/all" replace />} />
-
-            {/*
-              "/filter/:filterName" route:
-              - Displays the film table filtered by the selected filter.
-              - Shows the filter name and an "Add Film" button.
-              - The FilmTable receives the filtered films and handlers for delete, edit, favorite toggle, and rating.
-              - The filter is determined by the URL parameter.
-            */}
-            <Route path="/filter/:filterName" element={
-              <>
-                <div className="d-flex flex-row justify-content-between">
-                  <h1 className="my-2">Filter: <span>{filters[activeFilter].label}</span></h1>
-                  {showAddButton &&
-                    <Button variant="success" className="my-2" onClick={() => navigate('/add')}>
-                      <i className="bi bi-plus-lg"></i> Add Film
-                    </Button>
-                  }
-                </div>
-                <FilmTable
-                  films={films.filter(filters[activeFilter].filterFunction)}
-                  delete={deleteFilm}
-                  onEdit={film => navigate(`/edit/${film.id}`)}
-                  onToggleFavorite={toggleFavorite}
-                  onSetRating={setRating}
-                />
-              </>
-            } />
-
-            {/*
-              "/add" route:
-              - Shows the FilmForm for adding a new film.
-              - The addFilm handler is passed to the form.
-              - onCancel navigates back to the current filter.
-            */}
-            <Route path="/add" element={
-              <>
-                <h1 className="my-2">Add Film</h1>
-                <FilmForm addFilm={addFilm} onCancel={() => navigate(`/filter/${activeFilter}`)} />
-              </>
-            } />
-
-            {/*
-              "/edit/:filmId" route:
-              - Shows the FilmForm for editing an existing film.
-              - The EditFilmWrapper extracts the filmId from the URL, finds the film, and passes it to the form.
-              - editFilm and onCancel handlers are provided.
-            */}
-            <Route path="/edit/:filmId" element={
-              <>
-                <EditFilmWrapper getFilmById={getFilmById} editFilm={editFilm} onCancel={() => navigate(`/filter/${activeFilter}`)} />
-              </>
-            } />
-
-            {/*
-              "*" (catch-all) route:
-              - Redirects any unknown route to "/filter/all".
-              - Acts as a fallback for invalid URLs.
-            */}
-            <Route path="*" element={<Navigate to="/filter/all" replace />} />
-          </Routes>
+          {/* Outlet for nested routes */}
+          <Outlet context={{
+            films, filters, activeFilter, deleteFilm, toggleFavorite, setRating, navigate, addFilm, editFilm, getFilmById, filterArray, handleFilterSelect
+          }} />
         </Col>
       </Row>
       <Row>
@@ -212,21 +134,72 @@ function AppContent() {
 
 // ----------
 
-// Wrapper for the edit route, extracts filmId from params and renders FilmForm for editing.
-function EditFilmWrapper({ getFilmById, editFilm, onCancel }) {
+// FilterPage: shows the film table with the current filter and add button
+function FilterPage() {
+  // Get context from Outlet
+  const { films, filters, activeFilter, deleteFilm, toggleFavorite, setRating, navigate } = useOutletContext();
+
+  return (
+    <>
+      <div className="d-flex flex-row justify-content-between">
+        <h1 className="my-2">Filter: <span>{filters[activeFilter].label}</span></h1>
+        <Button variant="success" className="my-2" onClick={() => navigate('/add')}>
+          <i className="bi bi-plus-lg"></i> Add Film
+        </Button>
+      </div>
+      <FilmTable
+        films={films.filter(filters[activeFilter].filterFunction)}
+        delete={deleteFilm}
+        onEdit={film => navigate(`/edit/${film.id}`)}
+        onToggleFavorite={toggleFavorite}
+        onSetRating={setRating}
+      />
+    </>
+  );
+}
+
+// AddPage: shows the FilmForm for adding a film
+function AddPage() {
+  const { addFilm, activeFilter, navigate } = useOutletContext();
+  return (
+    <>
+      <h1 className="my-2">Add Film</h1>
+      <FilmForm addFilm={addFilm} onCancel={() => navigate('/filter')} />
+    </>
+  );
+}
+
+// EditPage: shows the FilmForm for editing a film
+function EditPage() {
+  const { getFilmById, editFilm, navigate } = useOutletContext();
   const { filmId } = useParams();
   const film = getFilmById(filmId);
   if (!film) return <p>Film not found</p>;
-  return <FilmForm editingFilm={film} editFilm={editFilm} onCancel={onCancel} />;
+  return <FilmForm editingFilm={film} editFilm={editFilm} onCancel={() => navigate('/filter')} />;
 }
 
 // ----------
 
-// Root App component, sets up the router.
+// Root App component, sets up the router with nested routes.
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <Routes>
+        {/* Root route with layout and sidebar */}
+        <Route path="/" element={<AppContent />}>
+          {/* Default: redirect to /filter */}
+          <Route index element={<Navigate to="/filter" replace />} />
+          {/* Filter table */}
+          <Route path="filter" element={<FilterPage />} />
+          <Route path="filter/:filterName" element={<FilterPage />} />
+          {/* Add film */}
+          <Route path="add" element={<AddPage />} />
+          {/* Edit film */}
+          <Route path="edit/:filmId" element={<EditPage />} />
+          {/* Catch-all: redirect to /filter */}
+          <Route path="*" element={<Navigate to="/filter" replace />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
