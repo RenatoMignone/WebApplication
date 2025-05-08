@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Form, Button, Alert, Row, Col } from 'react-bootstrap';
 import dayjs from 'dayjs';
 
-// FilmForm handles both add and edit operations
+// ----------
+
+// FilmForm handles both add and edit operations for films.
 function FilmForm({ addFilm, editFilm, editingFilm, onCancel }) {
   // If editingFilm is set, we're editing, otherwise we're adding
   const [title, setTitle] = useState(editingFilm ? editingFilm.title : '');
@@ -10,6 +12,8 @@ function FilmForm({ addFilm, editFilm, editingFilm, onCancel }) {
   const [watchDate, setWatchDate] = useState(editingFilm && editingFilm.watchDate ? editingFilm.watchDate.format('YYYY-MM-DD') : '');
   const [rating, setRating] = useState(editingFilm && editingFilm.rating !== undefined ? editingFilm.rating : '');
   const [errorMsg, setErrorMsg] = useState('');
+
+  // ----------
 
   // Update form fields when editingFilm changes (for edit mode)
   useEffect(() => {
@@ -21,7 +25,9 @@ function FilmForm({ addFilm, editFilm, editingFilm, onCancel }) {
     }
   }, [editingFilm]);
 
-  // Validation and submit handler
+  // ----------
+
+  // Validation and submit handler for the form
   function handleSubmit(event) {
     event.preventDefault();
     // Validation
@@ -50,6 +56,9 @@ function FilmForm({ addFilm, editFilm, editingFilm, onCancel }) {
     setErrorMsg('');
   }
 
+  // ----------
+
+  // Render the form UI
   return (
     <Row className="my-3">
       <Col>
@@ -98,5 +107,7 @@ function FilmForm({ addFilm, editFilm, editingFilm, onCancel }) {
     </Row>
   );
 }
+
+// ----------
 
 export default FilmForm;

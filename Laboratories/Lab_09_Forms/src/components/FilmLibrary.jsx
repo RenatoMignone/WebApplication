@@ -1,12 +1,8 @@
 import 'dayjs';
 import { Table, Form, Button } from 'react-bootstrap';
 
-/**
- * FilmTable component
- * Renders the table of films, using FilmRow for each film.
- */
 function FilmTable(props) {
-  const { films, activeFilter } = props;
+  const { films } = props;
 
   return (
     <Table>
@@ -20,30 +16,15 @@ function FilmTable(props) {
         </tr>
       </thead>
       <tbody>
-        {films.map((film) => 
-          <FilmRow 
-            filmData={film} 
-            key={film.id} 
-            delete={props.delete} 
-            onEdit={props.onEdit} // pass edit handler
-          />
-        )}
+        {films.map((film) => <FilmRow filmData={film} key={film.id} delete={props.delete} 
+           setFilmToEdit={props.setFilmToEdit} setShowForm={props.setShowForm} />)}
       </tbody>
     </Table>
   );
 }
 
-// ------------------------------------------------------------
-
-/**
- * FilmRow component
- * Renders a single row in the film table, showing film details and actions.
- */
 function FilmRow(props) {
 
-  /**
-   * Helper function to format the watch date using dayjs.
-   */
   const formatWatchDate = (dayJsDate, format) => {
     return dayJsDate ? dayJsDate.format(format) : '';
   }
@@ -56,7 +37,9 @@ function FilmRow(props) {
         </p>
       </td>
       <td className="text-center">
-        <Form.Check type="checkbox" defaultChecked={props.filmData.favorite ? true : false} />
+        {/* Note: the edit button and then the form should be used to edit the checkbox. 
+            If using defaultChecked, the value will not update upon re-render. */}
+        <Form.Check type="checkbox" checked={props.filmData.favorite ? true : false} readOnly />
       </td>
       <td>
         <small>{formatWatchDate(props.filmData.watchDate, 'MMMM D, YYYY')}</small>
@@ -69,9 +52,8 @@ function FilmRow(props) {
           onClick={() => { props.delete(props.filmData.id) }} >
           <i className='bi bi-trash'></i>
         </Button>
-        {/* Edit button */}
-        <Button variant='warning' className="ms-2"
-          onClick={() => props.onEdit(props.filmData)}>
+        <Button className="mx-2" variant='warning'
+          onClick={() => { props.setFilmToEdit(props.filmData); props.setShowForm(true); }} >
           <i className='bi bi-pencil'></i>
         </Button>
       </td>
@@ -79,12 +61,6 @@ function FilmRow(props) {
   );
 }
 
-// ------------------------------------------------------------
-
-/**
- * Rating component
- * Renders a star rating based on the given rating and maxStars.
- */
 function Rating(props) {
   // Create an array with props.maxStars elements, then run map to create the JSX elements for the array 
   return [...Array(props.maxStars)].map((el, index) =>
