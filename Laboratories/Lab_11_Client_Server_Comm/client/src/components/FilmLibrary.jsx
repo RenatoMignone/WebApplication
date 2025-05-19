@@ -1,10 +1,7 @@
 import 'dayjs';
 import { Table, Form, Button } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router';
 
-/**
- * FilmTable component
- * Renders the table of films, using FilmRow for each film.
- */
 function FilmTable(props) {
   const { films } = props;
 
@@ -20,29 +17,17 @@ function FilmTable(props) {
         </tr>
       </thead>
       <tbody>
-        {films.map((film) =>
-          <FilmRow
-            filmData={film}
-            key={film.id}
-            delete={props.delete}
-            onEdit={props.onEdit}
-            onToggleFavorite={props.onToggleFavorite}
-            onSetRating={props.onSetRating}
-          />
-        )}
+        {films.map((film) => <FilmRow filmData={film} key={film.id} delete={props.delete}
+           editFilm={props.editFilm} />)}
       </tbody>
     </Table>
   );
 }
 
-// ------------------------------------------------------------
-
-/**
- * FilmRow component
- * Renders a single row in the film table, showing film details and actions.
- */
 function FilmRow(props) {
-  const { filmData, onToggleFavorite, onSetRating } = props;
+  const location = useLocation();
+  const currentUrl = location.pathname;
+  //console.log("DEBUG: currentUrl in FilmRow: "+currentUrl);
 
   const formatWatchDate = (dayJsDate, format) => {
     return dayJsDate ? dayJsDate.format(format) : '';
@@ -51,61 +36,44 @@ function FilmRow(props) {
   return (
     <tr>
       <td>
-        <p className={filmData.favorite ? "favorite" : ""} >
-          {filmData.title}
+        <p className={props.filmData.favorite ? "favorite" : ""} >
+          {props.filmData.title}
         </p>
       </td>
       <td className="text-center">
-        <Form.Check
-          type="checkbox"
-          checked={filmData.favorite}
-          onChange={() => onToggleFavorite && onToggleFavorite(filmData.id)}
-        />
+        {/* Note: the true/false value of the checkbox is in event.target.checked
+            Instead, event.target.value contains "on" */}
+        <Form.Check type="checkbox" checked={props.filmData.favorite ? true : false} 
+          onChange={(event) => props.editFilm({...props.filmData, favorite: event.target.checked}) } />
       </td>
       <td>
-        <small>{formatWatchDate(filmData.watchDate, 'MMMM D, YYYY')}</small>
+        <small>{formatWatchDate(props.filmData.watchDate, 'MMMM D, YYYY')}</small>
       </td>
       <td>
-        <Rating
-          rating={filmData.rating}
-          maxStars={5}
-          onSetRating={rating => onSetRating && onSetRating(filmData.id, rating)}
-        />
+        <Rating rating={props.filmData.rating} maxStars={5} 
+          editRating={(newRating) => props.editFilm({ ...props.filmData, rating: newRating })} />
       </td>
       <td>
         <Button variant='danger'
-          onClick={() => { props.delete(filmData.id) }} >
+          onClick={() => { props.delete(props.filmData.id) }} >
           <i className='bi bi-trash'></i>
         </Button>
-        <Button variant='warning' className="ms-2"
-          onClick={() => props.onEdit(filmData)}>
-          <i className='bi bi-pencil'></i>
-        </Button>
+        <Link to={`/edit/${props.filmData.id}`} state={{previousUrl: currentUrl}} >
+          <Button className="mx-2" variant='warning'>
+            <i className='bi bi-pencil'></i>
+          </Button>
+        </Link>
       </td>
     </tr>
   );
 }
 
-// ------------------------------------------------------------
-
-/**
- * Rating component
- * Renders a star rating based on the given rating and maxStars.
- * Allows clicking on a star to set the rating.
- */
 function Rating(props) {
-  return (
-    <>
-      {[...Array(props.maxStars)].map((el, index) =>
-        <i
-          key={index}
-          className={(index < props.rating) ? "bi bi-star-fill" : "bi bi-star"}
-          style={{ cursor: props.onSetRating ? 'pointer' : 'default', color: '#f5c518' }}
-          onClick={props.onSetRating ? () => props.onSetRating(index + 1) : undefined}
-        />
-      )}
-    </>
-  );
+  // Create an array with props.maxStars elements, then run map to create the JSX elements for the array 
+  return [...Array(props.maxStars)].map((el, index) =>
+    <i key={index} className={(index < props.rating) ? "bi bi-star-fill" : "bi bi-star"}
+      onClick={() => props.editRating(index+1)} />
+  )
 }
 
 export { FilmTable };

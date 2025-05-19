@@ -1,54 +1,64 @@
+import dayjs from 'dayjs';
+
+const SERVER_URL = 'http://localhost:3001/api/';
+
+
 /**
- * All the API calls
+ * A utility function for parsing the HTTP response.
  */
+function getJson(httpResponsePromise) {
+  // server API always return JSON, in case of error the format is the following { error: <message> } 
+  return new Promise((resolve, reject) => {
+    httpResponsePromise
+      .then((response) => {
+        if (response.ok) {
 
-import dayjs from "dayjs";
+         // the server always returns a JSON, even empty {}. Never null or non json, otherwise the method will fail
+         response.json()
+            .then( json => resolve(json) )
+            .catch( err => reject({ error: "Cannot parse server response" }))
 
-const URL = 'http://localhost:3001/api';
-
-async function getQuestion(id) {
-    // call  /api/questions/<id>
-    const response = await fetch(URL+`/questions/${id}`);
-    const question = await response.json();
-    if (response.ok) {
-        const e = question;
-        return {id: e.id, text: e.text, questioner: e.author, date: dayjs(e.date)};
-    } else {
-        throw question;  // expected to be a json object (coming from the server) with info about the error
-    }
+        } else {
+          // analyzing the cause of error
+          response.json()
+            .then(obj => 
+              reject(obj)
+              ) // error msg in the response body
+            .catch(err => reject({ error: "Cannot parse server response" })) // something else
+        }
+      })
+      .catch(err => 
+        reject({ error: "Cannot communicate"  })
+      ) // connection error
+  });
 }
 
-async function getAnswersByQuestionId(id) {
-    // call  /api/questions/<id>/answers
-    const response = await fetch(URL+`/questions/${id}/answers`);
-    const answers = await response.json();
-    if (response.ok) {
-        return answers.map( (e) =>
-            ({id: e.id, text: e.text, respondent: e.respondent,
-                score: e.score, date: dayjs(e.date), questionId: e.questionId})
-        );
-    } else {
-        throw answers;  // expected to be a json object (coming from the server) with info about the error
-    }
+/**
+ * Getting from the server side and returning the list of films.
+ * The list of films could be filtered in the server-side through the optional parameter: filter.
+ */
+const getFilms = async (filter) => {
+  // film.watchDate could be null or a string in the format YYYY-MM-DD
+  return getJson(
+    filter 
+      ? fetch(SERVER_URL + 'films?filter=' + filter)
+      : fetch(SERVER_URL + 'films')
+  ).then( json => {
+    return json.map((film) => {
+      const clientFilm = {
+        id: film.id,
+        title: film.title,
+        favorite: film.favorite,
+        rating: film.rating,
+        user: film.user
+      }
+      if (film.watchDate != null)
+        clientFilm.watchDate = dayjs(film.watchDate);
+      return clientFilm;
+    })
+  })
 }
 
-async function getFilms(filter = 'all') {
-    let url = `${URL}/films`;
-    if (filter && filter !== 'all') {
-        url += `?filter=${filter}`;
-    }
-    const response = await fetch(url);
-    const films = await response.json();
-    if (response.ok) {
-        return films.map(f => ({
-            ...f,
-            watchDate: f.watchDate ? dayjs(f.watchDate) : undefined
-        }));
-    } else {
-        throw films;
-    }
-}
 
-const API = {getQuestion, getAnswersByQuestionId, getFilms};
-
+const API = { getFilms };
 export default API;
