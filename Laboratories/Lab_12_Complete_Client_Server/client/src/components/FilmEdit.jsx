@@ -1,14 +1,24 @@
+/*
+ * Web Applications - Film Edit/Add Form Component
+ */
+
 import dayjs from 'dayjs';
 
 import {useState} from 'react';
 import {Form, Button, Alert} from 'react-bootstrap';
 import { useNavigate, useLocation, Link } from 'react-router';
 
+//---------------------------------------------------------------------------------
+//------------------------------- FILM FORM COMPONENT -----------------------------
+//---------------------------------------------------------------------------------
 const FilmForm = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   //console.log('DEBUG: previousUrl: '+location.state.previousUrl);
 
+  //---------------------------------------------------------------------------------
+  //------------------------------- STATE VARIABLES --------------------------------
+  //---------------------------------------------------------------------------------
   /*
    * Creating a state for each parameter of the film.
    * There are two possible cases: 
@@ -22,6 +32,13 @@ const FilmForm = (props) => {
 
   const [errorMsg, setErrorMsg] = useState('');
 
+  //---------------------------------------------------------------------------------
+  //------------------------------- FORM SUBMISSION --------------------------------
+  //---------------------------------------------------------------------------------
+  /**
+   * Handles the form submission for both add and edit film.
+   * Validates input and calls the appropriate prop function.
+   */
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -56,6 +73,9 @@ const FilmForm = (props) => {
     }
   }
 
+  //---------------------------------------------------------------------------------
+  //------------------------------- RENDERING --------------------------------------
+  //---------------------------------------------------------------------------------
   return (
     <>
     {errorMsg? <Alert variant='danger' onClose={()=>setErrorMsg('')} dismissible>{errorMsg}</Alert> : false }

@@ -1,10 +1,22 @@
+/*
+ * Web Applications - API Utility Functions
+ */
+
 import dayjs from 'dayjs';
 
+//---------------------------------------------------------------------------------
+//------------------------------- SERVER URL --------------------------------------
+//---------------------------------------------------------------------------------
 const SERVER_URL = 'http://localhost:3001/api/';
 
 
+//---------------------------------------------------------------------------------
+//------------------------------- UTILITY FUNCTIONS -------------------------------
+//---------------------------------------------------------------------------------
+
 /**
  * A utility function for parsing the HTTP response.
+ * Always expects JSON from the server, even for errors.
  */
 function getJson(httpResponsePromise) {
   // server API always return JSON, in case of error the format is the following { error: <message> } 
@@ -33,13 +45,20 @@ function getJson(httpResponsePromise) {
   });
 }
 
+
+//---------------------------------------------------------------------------------
+//------------------------------- API: FILMS --------------------------------------
+//---------------------------------------------------------------------------------
+
 /**
- * Getting from the server side and returning the list of films.
- * The list of films could be filtered in the server-side through the optional parameter: filter.
+ * Get the list of films from the server.
+ * Optionally filtered by a filter parameter.
+ * Converts watchDate to dayjs object if present.
  */
 const getFilms = async (filter) => {
   // film.watchDate could be null or a string in the format YYYY-MM-DD
   return getJson(
+    // if filter is set, use the filter API, otherwise use the default API
     filter 
       ? fetch(SERVER_URL + 'films?filter=' + filter)
       : fetch(SERVER_URL + 'films')
@@ -59,7 +78,12 @@ const getFilms = async (filter) => {
   })
 }
 
-// Add a new film
+//---------------------------------------------------------------------------------
+
+/**
+ * Add a new film to the server.
+ * Converts favorite to 0/1 and watchDate to string.
+ */
 const addFilm = async (film) => {
   // Convert favorite to 0/1 for server, and watchDate to string
   const body = {
@@ -77,7 +101,12 @@ const addFilm = async (film) => {
   );
 }
 
-// Edit an existing film
+//---------------------------------------------------------------------------------
+
+/**
+ * Edit an existing film on the server.
+ * Converts favorite to 0/1 and watchDate to string.
+ */
 const editFilm = async (film) => {
   const body = {
     id: film.id,
@@ -95,7 +124,11 @@ const editFilm = async (film) => {
   );
 }
 
-// Delete a film
+//---------------------------------------------------------------------------------
+
+/**
+ * Delete a film from the server by id.
+ */
 const deleteFilm = async (id) => {
   return getJson(
     fetch(SERVER_URL + `films/${id}`, {
@@ -104,7 +137,12 @@ const deleteFilm = async (id) => {
   );
 }
 
-// Update favorite property in-line
+//---------------------------------------------------------------------------------
+
+/**
+ * Update the favorite property of a film in-line.
+ * Used for quick favorite toggling.
+ */
 const updateFavorite = async (film) => {
   const body = {
     id: film.id,
@@ -122,7 +160,12 @@ const updateFavorite = async (film) => {
   );
 }
 
-// Update rating in-line
+//---------------------------------------------------------------------------------
+
+/**
+ * Update the rating of a film in-line.
+ * Uses a delta API if rating is set, otherwise falls back to editFilm.
+ */
 const updateRating = async (film, newRating) => {
   // If rating is not set, fallback to editFilm
   if (!film.rating) {
@@ -144,6 +187,10 @@ const updateRating = async (film, newRating) => {
     })
   );
 }
+
+//---------------------------------------------------------------------------------
+//------------------------------- EXPORT API OBJECT -------------------------------
+//---------------------------------------------------------------------------------
 
 const API = { getFilms, addFilm, editFilm, deleteFilm, updateFavorite, updateRating };
 export default API;
