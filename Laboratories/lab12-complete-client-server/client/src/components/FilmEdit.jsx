@@ -1,31 +1,18 @@
-/*
- * Web Applications - Film Edit/Add Form Component
- */
-
 import dayjs from 'dayjs';
 
 import {useState} from 'react';
 import {Form, Button, Alert} from 'react-bootstrap';
-import { useNavigate, useLocation, Link } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 
-//---------------------------------------------------------------------------------
-//------------------------------- FILM FORM COMPONENT -----------------------------
-//---------------------------------------------------------------------------------
 const FilmForm = (props) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  //console.log('DEBUG: previousUrl: '+location.state.previousUrl);
 
-  //---------------------------------------------------------------------------------
-  //------------------------------- STATE VARIABLES --------------------------------
-  //---------------------------------------------------------------------------------
   /*
    * Creating a state for each parameter of the film.
    * There are two possible cases: 
    * - if we are creating a new film, the form is initialized with the default values.
    * - if we are editing a film, the form is pre-filled with the previous values.
    */
-  
   const [title, setTitle] = useState(props.filmToEdit ? props.filmToEdit.title : '');
   const [favorite, setFavorite] = useState(props.filmToEdit ? props.filmToEdit.favorite : false);
   const [watchDate, setWatchDate] = useState((props.filmToEdit && props.filmToEdit.watchDate) ? props.filmToEdit.watchDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'));
@@ -33,24 +20,19 @@ const FilmForm = (props) => {
 
   const [errorMsg, setErrorMsg] = useState('');
 
-  //---------------------------------------------------------------------------------
-  //------------------------------- FORM SUBMISSION --------------------------------
-  //---------------------------------------------------------------------------------
-  /**
-   * Handles the form submission for both add and edit film.
-   * Validates input and calls the appropriate prop function.
-   */
   const handleSubmit = (event) => {
     event.preventDefault();
 
     // String.trim() method is used for removing leading and ending whitespaces from the title.
-    const film = { "title": title.trim(), "favorite": favorite, "rating": rating }
+    const film = { "title": title.trim(), "favorite": favorite, "rating": (isNaN(parseInt(rating))? rating : parseInt(rating)) }
     if (watchDate)  // adding watchDate only if it is defined
       film.watchDate = dayjs(watchDate);
 
     // Here some data validation can be inserted, if not yet forced with HTML5 attributes on form controls
     if (film.title.length == 0) {
       setErrorMsg('Title length cannot be 0');
+    } else if (typeof film.rating === "string") {
+      setErrorMsg('Invalid Rating value');
     } else if (film.rating < 0 || film.rating > 5) {
       setErrorMsg('Invalid value for Rating');
     } else {
@@ -59,24 +41,14 @@ const FilmForm = (props) => {
       if (props.filmToEdit) {
         // Film was edited, not created from scratch
         film.id = props.filmToEdit.id;
-        props.editFilm(film);
-        // The received state is to tell to which page (i.e., filter) the application should go back
-        const prevUrl = (location.state && location.state.previousUrl) || '/';
-        // The state is to tell not to reload from server otherwise the result of edit cannot be seen, later it will be removed
-        navigate(`${prevUrl}`, {state: {reloadFromServer: false}});  
+        props.editFilm(film, '/');
+        //navigate('/'); //  not here, we must wait for the editing on the server to be finished
       } else {
         props.addFilm(film);
-        // The received state is to tell to which page (i.e., filter) the application should go back
-        const prevUrl = (location.state && location.state.previousUrl) || '/';
-        // The state is to tell not to reload from server otherwise the result of add cannot be seen, later it will be removed
-        navigate(`${prevUrl}`, {state: {reloadFromServer: false}});
       }
     }
   }
 
-  //---------------------------------------------------------------------------------
-  //------------------------------- RENDERING --------------------------------------
-  //---------------------------------------------------------------------------------
   return (
     <>
     {errorMsg? <Alert variant='danger' onClose={()=>setErrorMsg('')} dismissible>{errorMsg}</Alert> : false }
